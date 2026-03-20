@@ -50,9 +50,9 @@ src/
 2. **Gradle 8.x** instalado (`gradle --version`).
 3. **Google Chrome** instalado (la resolución del driver la gestiona Selenium Manager).
 4. **Aplicación corriendo** en `http://localhost:3001` antes de ejecutar las pruebas.
-5. **Actualizar credenciales** en `src/test/resources/features/signin_screenplay.feature`:
-   - Credencial válida: reemplaza `test@correo.com` / `Test1234` con un usuario real.
-   - Credencial inválida: puede dejarse igual o ajustarse.
+5. **Credenciales del caso exitoso** en `src/test/resources/features/signin_screenplay.feature`:
+  - Credencial válida: `juan.perez@example.com` / `SecurePass123!`
+  - Credencial inválida: puede dejarse igual o ajustarse.
 6. **Ajustar selectores** en `src/test/java/com/auto/ui/ui/SignInPage.java` si los campos del formulario tienen otros atributos `name` o clases CSS.
 
 ---
@@ -97,6 +97,26 @@ Después de ejecutar `aggregate`, abre en el navegador:
 
 ```
 target/site/serenity/index.html
+```
+
+### Comandos para abrir el reporte
+
+#### Linux
+
+```bash
+xdg-open target/site/serenity/index.html
+```
+
+#### macOS
+
+```bash
+open target/site/serenity/index.html
+```
+
+#### Windows (PowerShell)
+
+```powershell
+start target/site/serenity/index.html
 ```
 
 ---

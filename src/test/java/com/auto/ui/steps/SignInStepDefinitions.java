@@ -31,8 +31,8 @@ public class SignInStepDefinitions {
     @Before
     public void prepararEscenario() {
         setTheStage(new OnlineCast());
-        validEmail = "qa" + System.currentTimeMillis() + "@correo.com";
-        validPassword = "Test1234";
+        validEmail = "juan.perez@example.com";
+        validPassword = "SecurePass123!";
         theActorCalled("Usuario").attemptsTo(
                 EnsureUserExists.with("Usuario QA", validEmail, validPassword)
         );
@@ -59,7 +59,7 @@ public class SignInStepDefinitions {
         String effectiveEmail = email;
         String effectivePassword = password;
 
-        if ("test@correo.com".equals(email) && "Test1234".equals(password)) {
+        if ("juan.perez@example.com".equals(email) && "SecurePass123!".equals(password)) {
             effectiveEmail = validEmail;
             effectivePassword = validPassword;
         }

@@ -4,7 +4,7 @@ Feature: Autenticación de usuario en la plataforma
   @flujo-positivo
   Scenario: Inicio de sesión exitoso con credenciales válidas
     Given el usuario se encuentra en la pantalla de inicio de sesión
-    When el usuario ingresa el correo "test@correo.com" y la contraseña "Test1234"
+    When el usuario ingresa el correo "juan.perez@example.com" y la contraseña "SecurePass123!"
     And envía el formulario de inicio de sesión
     Then el usuario accede exitosamente al dashboard
 
