@@ -83,4 +83,5 @@ test {
     }
 
     ignoreFailures = true
+    finalizedBy 'aggregate'
 }

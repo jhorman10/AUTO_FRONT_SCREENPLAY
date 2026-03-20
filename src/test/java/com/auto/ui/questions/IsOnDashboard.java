@@ -2,6 +2,7 @@ package com.auto.ui.questions;
 
 import java.time.Duration;
 
+import com.auto.ui.utils.TestConstants;
 import net.serenitybdd.screenplay.Actor;
 import net.serenitybdd.screenplay.Question;
 import net.serenitybdd.screenplay.abilities.BrowseTheWeb;
@@ -20,7 +21,7 @@ public class IsOnDashboard implements Question<Boolean> {
         WebDriver driver = BrowseTheWeb.as(actor).getDriver();
 
         try {
-            return new WebDriverWait(driver, Duration.ofSeconds(10))
+            return new WebDriverWait(driver, Duration.ofSeconds(TestConstants.DASHBOARD_WAIT_TIMEOUT_SECONDS))
                     .until(currentDriver -> {
                         String currentUrl = currentDriver.getCurrentUrl();
                         boolean hasAuthenticatedNavigation = !currentDriver.findElements(AUTHENTICATED_NAVIGATION).isEmpty();

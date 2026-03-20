@@ -6,6 +6,7 @@ import com.auto.ui.tasks.EnsureUserExists;
 import com.auto.ui.tasks.EnterCredentials;
 import com.auto.ui.tasks.OpenSignInPage;
 import com.auto.ui.tasks.SubmitLogin;
+import com.auto.ui.utils.TestConstants;
 import io.cucumber.java.After;
 import io.cucumber.java.Before;
 import io.cucumber.java.en.Given;
@@ -23,6 +24,11 @@ import static org.hamcrest.Matchers.emptyOrNullString;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 
+import java.io.IOException;
+import java.net.HttpURLConnection;
+import java.net.URI;
+import java.util.concurrent.locks.LockSupport;
+
 public class SignInStepDefinitions {
 
     private String validEmail;
@@ -30,11 +36,12 @@ public class SignInStepDefinitions {
 
     @Before
     public void prepararEscenario() {
+        waitForApplicationAvailability();
         setTheStage(new OnlineCast());
-        validEmail = "juan.perez@example.com";
-        validPassword = "SecurePass123!";
-        theActorCalled("Usuario").attemptsTo(
-                EnsureUserExists.with("Usuario QA", validEmail, validPassword)
+        validEmail = TestConstants.DEFAULT_VALID_EMAIL;
+        validPassword = TestConstants.DEFAULT_VALID_PASSWORD;
+        theActorCalled(TestConstants.ACTOR_NAME).attemptsTo(
+            EnsureUserExists.with(TestConstants.DEFAULT_FULL_NAME, validEmail, validPassword)
         );
     }
 
@@ -44,6 +51,46 @@ public class SignInStepDefinitions {
             BrowseTheWeb.as(theActorInTheSpotlight()).getDriver().quit();
         } finally {
             drawTheCurtain();
+        }
+    }
+
+    private void waitForApplicationAvailability() {
+        String targetUrl = TestConstants.BASE_URL + TestConstants.SIGN_UP_PATH;
+        long deadline = System.currentTimeMillis() + (TestConstants.APP_AVAILABILITY_TIMEOUT_SECONDS * 1000L);
+
+        while (System.currentTimeMillis() < deadline) {
+            if (isHttpReachable(targetUrl)) {
+                return;
+            }
+
+            LockSupport.parkNanos(TestConstants.APP_AVAILABILITY_POLL_INTERVAL_MILLIS * 1_000_000L);
+            if (Thread.currentThread().isInterrupted()) {
+                Thread.currentThread().interrupt();
+                throw new IllegalStateException("Se interrumpio la espera de disponibilidad de la app");
+            }
+        }
+
+        throw new IllegalStateException(
+                "La aplicacion no responde en " + targetUrl + " dentro de "
+                        + TestConstants.APP_AVAILABILITY_TIMEOUT_SECONDS + " segundos"
+        );
+    }
+
+    private boolean isHttpReachable(String targetUrl) {
+        HttpURLConnection connection = null;
+        try {
+            connection = (HttpURLConnection) URI.create(targetUrl).toURL().openConnection();
+            connection.setRequestMethod("GET");
+            connection.setConnectTimeout(2000);
+            connection.setReadTimeout(2000);
+            int statusCode = connection.getResponseCode();
+            return statusCode >= 200 && statusCode < 500;
+        } catch (IOException ignored) {
+            return false;
+        } finally {
+            if (connection != null) {
+                connection.disconnect();
+            }
         }
     }
 
@@ -59,7 +106,7 @@ public class SignInStepDefinitions {
         String effectiveEmail = email;
         String effectivePassword = password;
 
-        if ("juan.perez@example.com".equals(email) && "SecurePass123!".equals(password)) {
+        if (TestConstants.DEFAULT_VALID_EMAIL.equals(email) && TestConstants.DEFAULT_VALID_PASSWORD.equals(password)) {
             effectiveEmail = validEmail;
             effectivePassword = validPassword;
         }

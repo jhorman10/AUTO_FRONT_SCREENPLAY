@@ -1,6 +1,7 @@
 package com.auto.ui.tasks;
 
 import com.auto.ui.ui.SignUpPage;
+import com.auto.ui.utils.TestConstants;
 import net.serenitybdd.screenplay.Actor;
 import net.serenitybdd.screenplay.Task;
 import net.serenitybdd.screenplay.actions.Click;
@@ -22,7 +23,7 @@ public class EnsureUserExists implements Task {
     @Override
     public <T extends Actor> void performAs(T actor) {
         actor.attemptsTo(
-                Open.url("http://localhost:3001/signup"),
+            Open.url(TestConstants.BASE_URL + TestConstants.SIGN_UP_PATH),
                 Enter.theValue(fullName).into(SignUpPage.NAME_FIELD),
                 Enter.theValue(email).into(SignUpPage.EMAIL_FIELD),
                 Enter.theValue(password).into(SignUpPage.PASSWORD_FIELD),
