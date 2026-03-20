@@ -13,7 +13,9 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 public class IsOnDashboard implements Question<Boolean> {
 
     private static final By AUTHENTICATED_NAVIGATION = By.xpath(
-            "//button[normalize-space()='Cerrar sesión'] | //a[@href='/dashboard' and normalize-space()='Dashboard']"
+        "//button[normalize-space()='Cerrar sesión'] | //a[@href='"
+            + TestConstants.DASHBOARD_PATH
+            + "' and normalize-space()='Dashboard']"
     );
 
     @Override
@@ -25,7 +27,8 @@ public class IsOnDashboard implements Question<Boolean> {
                     .until(currentDriver -> {
                         String currentUrl = currentDriver.getCurrentUrl();
                         boolean hasAuthenticatedNavigation = !currentDriver.findElements(AUTHENTICATED_NAVIGATION).isEmpty();
-                        boolean isOutsideSignIn = !currentUrl.contains("/signin") && !currentUrl.contains("/login");
+                        boolean isOutsideSignIn = !currentUrl.contains(TestConstants.SIGN_IN_PATH)
+                            && !currentUrl.contains(TestConstants.LOGIN_PATH);
                         return hasAuthenticatedNavigation || isOutsideSignIn;
                     });
         } catch (org.openqa.selenium.TimeoutException ignored) {

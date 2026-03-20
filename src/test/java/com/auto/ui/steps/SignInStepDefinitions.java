@@ -80,11 +80,12 @@ public class SignInStepDefinitions {
         HttpURLConnection connection = null;
         try {
             connection = (HttpURLConnection) URI.create(targetUrl).toURL().openConnection();
-            connection.setRequestMethod("GET");
-            connection.setConnectTimeout(2000);
-            connection.setReadTimeout(2000);
+            connection.setRequestMethod(TestConstants.HTTP_METHOD_GET);
+            connection.setConnectTimeout(TestConstants.HTTP_CONNECT_TIMEOUT_MILLIS);
+            connection.setReadTimeout(TestConstants.HTTP_READ_TIMEOUT_MILLIS);
             int statusCode = connection.getResponseCode();
-            return statusCode >= 200 && statusCode < 500;
+            return statusCode >= TestConstants.HTTP_SUCCESS_STATUS_MIN
+                    && statusCode < TestConstants.HTTP_SERVER_ERROR_STATUS_MIN;
         } catch (IOException ignored) {
             return false;
         } finally {
@@ -114,6 +115,22 @@ public class SignInStepDefinitions {
         theActorInTheSpotlight().attemptsTo(
                 EnterCredentials.with(effectiveEmail, effectivePassword)
         );
+    }
+
+    @When("el usuario ingresa las credenciales {string}")
+    public void elUsuarioIngresaCredencialesPorAlias(String credentialsAlias) {
+        String normalizedAlias = credentialsAlias == null ? "" : credentialsAlias.trim().toUpperCase();
+
+        switch (normalizedAlias) {
+            case TestConstants.CREDENTIALS_ALIAS_VALIDAS:
+                elUsuarioIngresaCredenciales(TestConstants.DEFAULT_VALID_EMAIL, TestConstants.DEFAULT_VALID_PASSWORD);
+                break;
+            case TestConstants.CREDENTIALS_ALIAS_INVALIDAS:
+                elUsuarioIngresaCredenciales(TestConstants.DEFAULT_INVALID_EMAIL, TestConstants.DEFAULT_INVALID_PASSWORD);
+                break;
+            default:
+                throw new IllegalArgumentException("Alias de credenciales no soportado: " + credentialsAlias);
+        }
     }
 
     @When("envía el formulario de inicio de sesión")
