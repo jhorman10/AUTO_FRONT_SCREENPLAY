@@ -2,6 +2,7 @@ package com.auto.ui.steps;
 
 import com.auto.ui.questions.IsOnDashboard;
 import com.auto.ui.questions.LoginErrorMessage;
+import com.auto.ui.tasks.EnsureUserExists;
 import com.auto.ui.tasks.EnterCredentials;
 import com.auto.ui.tasks.OpenSignInPage;
 import com.auto.ui.tasks.SubmitLogin;
@@ -24,9 +25,17 @@ import static org.hamcrest.Matchers.not;
 
 public class SignInStepDefinitions {
 
+    private String validEmail;
+    private String validPassword;
+
     @Before
     public void prepararEscenario() {
         setTheStage(new OnlineCast());
+        validEmail = "qa" + System.currentTimeMillis() + "@correo.com";
+        validPassword = "Test1234";
+        theActorCalled("Usuario").attemptsTo(
+                EnsureUserExists.with("Usuario QA", validEmail, validPassword)
+        );
     }
 
     @After
@@ -40,15 +49,23 @@ public class SignInStepDefinitions {
 
     @Given("el usuario se encuentra en la pantalla de inicio de sesión")
     public void elUsuarioSeEncuentraEnLaPantallaDeInicioSesion() {
-        theActorCalled("Usuario").attemptsTo(
+        theActorInTheSpotlight().attemptsTo(
                 OpenSignInPage.now()
         );
     }
 
     @When("el usuario ingresa el correo {string} y la contraseña {string}")
     public void elUsuarioIngresaCredenciales(String email, String password) {
+        String effectiveEmail = email;
+        String effectivePassword = password;
+
+        if ("test@correo.com".equals(email) && "Test1234".equals(password)) {
+            effectiveEmail = validEmail;
+            effectivePassword = validPassword;
+        }
+
         theActorInTheSpotlight().attemptsTo(
-                EnterCredentials.with(email, password)
+                EnterCredentials.with(effectiveEmail, effectivePassword)
         );
     }
 

@@ -20,6 +20,43 @@ ext {
     cucumberVersion    = '7.11.1'
 }
 
+def resolveCachedChromeDriver() {
+    def baseDir = new File(System.getProperty('user.home'), '.cache/selenium/chromedriver/linux64')
+    if (!baseDir.exists()) {
+        return null
+    }
+
+    def candidates = []
+    baseDir.eachDir { versionDir ->
+        def binary = new File(versionDir, 'chromedriver')
+        if (binary.exists() && binary.canExecute()) {
+            candidates << [
+                version: versionDir.name,
+                path: binary.absolutePath,
+                parts: versionDir.name.tokenize('.').collect { it.isInteger() ? it.toInteger() : 0 }
+            ]
+        }
+    }
+
+    if (candidates.isEmpty()) {
+        return null
+    }
+
+    candidates.sort { a, b ->
+        def maxSize = Math.max(a.parts.size(), b.parts.size())
+        for (int i = 0; i < maxSize; i++) {
+            def av = i < a.parts.size() ? a.parts[i] : 0
+            def bv = i < b.parts.size() ? b.parts[i] : 0
+            if (av != bv) {
+                return av <=> bv
+            }
+        }
+        return 0
+    }
+
+    return candidates.last().path
+}
+
 dependencies {
     testImplementation "net.serenity-bdd:serenity-core:${serenityCoreVersion}"
     testImplementation "net.serenity-bdd:serenity-screenplay:${serenityCoreVersion}"
@@ -33,9 +70,17 @@ dependencies {
 }
 
 test {
+    def cachedChromeDriver = resolveCachedChromeDriver()
+
     testLogging {
         events 'passed', 'skipped', 'failed'
     }
+
     systemProperty 'file.encoding', 'UTF-8'
+
+    if (cachedChromeDriver) {
+        systemProperty 'webdriver.chrome.driver', cachedChromeDriver
+    }
+
     ignoreFailures = true
 }
