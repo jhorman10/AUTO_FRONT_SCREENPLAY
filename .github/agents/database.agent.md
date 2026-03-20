@@ -3,12 +3,7 @@ name: Database Agent
 description: Diseña y gestiona esquemas de datos, modelos, migrations y seeders. Úsalo cuando la spec incluye cambios en modelos de datos. Trabaja en paralelo o antes del backend-developer.
 model: Claude Sonnet 4.6 (copilot)
 tools:
-  - read/readFile
-  - edit/createFile
-  - edit/editFiles
-  - search/listDirectory
-  - search
-  - execute/runInTerminal
+[vscode, execute, read, agent, edit, search, web, browser, 'gitkraken/*', vscode.mermaid-chat-features/renderMermaidDiagram, vscjava.vscode-java-debug/debugJavaApplication, vscjava.vscode-java-debug/setJavaBreakpoint, vscjava.vscode-java-debug/debugStepOperation, vscjava.vscode-java-debug/getDebugVariables, vscjava.vscode-java-debug/getDebugStackTrace, vscjava.vscode-java-debug/evaluateDebugExpression, vscjava.vscode-java-debug/getDebugThreads, vscjava.vscode-java-debug/removeJavaBreakpoints, vscjava.vscode-java-debug/stopDebugSession, vscjava.vscode-java-debug/getDebugSessionInfo, todo]
 agents: []
 handoffs:
   - label: Delegar al Backend Agent

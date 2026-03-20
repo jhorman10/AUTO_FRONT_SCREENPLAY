@@ -3,12 +3,7 @@ name: Frontend Developer
 description: Implementa funcionalidades en el frontend siguiendo las specs ASDD aprobadas. Respeta la arquitectura de componentes, hooks y servicios del proyecto.
 model: Claude Sonnet 4.6 (copilot)
 tools:
-  - edit/createFile
-  - edit/editFiles
-  - read/readFile
-  - search/listDirectory
-  - search
-  - execute/runInTerminal
+[vscode, execute, read, agent, edit, search, web, browser, 'gitkraken/*', vscode.mermaid-chat-features/renderMermaidDiagram, vscjava.vscode-java-debug/debugJavaApplication, vscjava.vscode-java-debug/setJavaBreakpoint, vscjava.vscode-java-debug/debugStepOperation, vscjava.vscode-java-debug/getDebugVariables, vscjava.vscode-java-debug/getDebugStackTrace, vscjava.vscode-java-debug/evaluateDebugExpression, vscjava.vscode-java-debug/getDebugThreads, vscjava.vscode-java-debug/removeJavaBreakpoints, vscjava.vscode-java-debug/stopDebugSession, vscjava.vscode-java-debug/getDebugSessionInfo, todo]
 agents: []
 handoffs:
   - label: Generar Tests de Frontend

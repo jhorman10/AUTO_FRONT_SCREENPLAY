@@ -1,185 +1,130 @@
-# ASDD — Agent Spec-Driven Development
+# AUTO_FRONT_SCREENPLAY
 
-Framework de desarrollo asistido por IA que transforma requerimientos en código funcional mediante agentes especializados orquestados. Garantiza calidad y trazabilidad a través de especificaciones técnicas aprobadas antes de cualquier implementación.
+Proyecto de automatización UI con el patrón **Screenplay** sobre Serenity BDD, Cucumber y Gradle.  
+Cubre dos escenarios independientes del flujo de autenticación de la aplicación en `http://localhost:3001`.
+
+---
+
+## Stack
+
+| Herramienta | Versión |
+|---|---|
+| Java | 11+ |
+| Gradle | 8.x |
+| Serenity BDD | 3.9.8 |
+| Cucumber | 7.11.1 |
+| Chrome | última estable |
+
+---
+
+## Escenarios probados
+
+| # | Tipo | Descripción |
+|---|---|---|
+| 1 | Flujo positivo | Inicio de sesión exitoso con credenciales válidas → redirige al dashboard |
+| 2 | Flujo negativo | Inicio de sesión fallido con credenciales inválidas → muestra mensaje de error |
+
+---
+
+## Estructura del proyecto
 
 ```
-Requerimiento → Spec → [Backend ∥ Frontend ∥ DB] → [Tests BE ∥ Tests FE] → QA → Docs
+src/
+└── test/
+    ├── java/com/auto/ui/
+    │   ├── runners/     → CucumberTestSuite.java
+    │   ├── steps/       → SignInStepDefinitions.java
+    │   ├── tasks/       → OpenSignInPage / EnterCredentials / SubmitLogin
+    │   ├── questions/   → IsOnDashboard / LoginErrorMessage
+    │   └── ui/          → SignInPage (Targets)
+    └── resources/
+        ├── features/    → signin_screenplay.feature
+        └── serenity.conf
 ```
 
 ---
 
-## Compatibilidad
+## Precondiciones
 
-| Herramienta | Configuración | Carpeta de agentes |
-|-------------|---------------|--------------------|
-| **Claude Code CLI** | `.claude/settings.json` | `.claude/agents/` |
-| **GitHub Copilot** | `.github/copilot-instructions.md` | `.github/agents/` |
-
-Ambas herramientas comparten el mismo flujo, las mismas specs y los mismos lineamientos. Solo difiere la carpeta de entrada de los agentes.
+1. **Java 11+** instalado y en `PATH`.
+2. **Gradle 8.x** instalado (`gradle --version`).
+3. **Google Chrome** instalado (la resolución del driver la gestiona Selenium Manager).
+4. **Aplicación corriendo** en `http://localhost:3001` antes de ejecutar las pruebas.
+5. **Actualizar credenciales** en `src/test/resources/features/signin_screenplay.feature`:
+   - Credencial válida: reemplaza `test@correo.com` / `Test1234` con un usuario real.
+   - Credencial inválida: puede dejarse igual o ajustarse.
+6. **Ajustar selectores** en `src/test/java/com/auto/ui/ui/SignInPage.java` si los campos del formulario tienen otros atributos `name` o clases CSS.
 
 ---
 
-## Instalación
+## Ejecución
 
-### Claude Code CLI
-
-1. Instala Claude Code: https://claude.ai/code
-2. Autentícate con tu cuenta Anthropic
-3. Clona este repositorio en tu proyecto
-4. Copia `.claude/` a la raíz de tu proyecto
+### Inicializar el wrapper de Gradle (solo primera vez)
 
 ```bash
-cp -r .claude/ /tu-proyecto/.claude/
-cp -r .github/ /tu-proyecto/.github/
+gradle wrapper --gradle-version 8.7
 ```
 
-### GitHub Copilot
-
-1. Instala la extensión **GitHub Copilot Chat** en VS Code
-2. Activa el uso de instruction files en tu settings.json de VS Code:
-
-```json
-{
-  "github.copilot.chat.codeGeneration.useInstructionFiles": true
-}
-```
-
-3. Copia `.github/` a la raíz de tu proyecto
-
----
-
-## Flujo de trabajo
-
-### Opción A — Orquestación automática completa
-
-```
-/asdd-orchestrate nombre-feature
-```
-
-El Orchestrator gestiona todo: genera la spec, espera aprobación, ejecuta fases en paralelo y reporta el estado al final.
-
-### Opción B — Control manual paso a paso
+### Ejecutar las pruebas
 
 ```bash
-# 1. Generar especificación técnica
-/generate-spec nombre-feature
-
-# 2. Revisar y aprobar la spec generada en .github/specs/<feature>.spec.md
-#    Cambiar el campo:  status: DRAFT  →  status: APPROVED
-
-# 3. Implementar backend y frontend (se pueden ejecutar en paralelo)
-/implement-backend nombre-feature
-/implement-frontend nombre-feature
-
-# 4. Generar tests
-/unit-testing nombre-feature
-
-# 5. Análisis QA
-/gherkin-case-generator
-/risk-identifier
+./gradlew clean test --no-daemon
 ```
 
-> **Regla de Oro**: Ningún agente escribe código si la spec no tiene `status: APPROVED`.
-
----
-
-## Skills disponibles
-
-| Comando | Qué hace |
-|---------|----------|
-| `/asdd-orchestrate` | Orquesta el flujo ASDD completo |
-| `/generate-spec` | Genera spec técnica en `.github/specs/` |
-| `/implement-backend` | Implementa el backend según la spec aprobada |
-| `/implement-frontend` | Implementa el frontend según la spec aprobada |
-| `/unit-testing` | Genera tests unitarios e integración |
-| `/gherkin-case-generator` | Genera escenarios Given-When-Then y datos de prueba |
-| `/risk-identifier` | Clasifica riesgos de calidad (Alto / Medio / Bajo) |
-| `/automation-flow-proposer` | Propone flujos a automatizar con análisis de ROI |
-| `/performance-analyzer` | Define estrategia de performance testing con k6 |
-
----
-
-## Agentes disponibles
-
-| Agente | Fase | Responsabilidad |
-|--------|------|-----------------|
-| `orchestrator` | Entry point | Coordina el flujo completo |
-| `spec-generator` | 1 | Genera especificaciones técnicas |
-| `backend-developer` | 2 | Rutas, servicios, repositorios |
-| `frontend-developer` | 2 | Páginas, componentes, hooks |
-| `database-agent` | 2 | Modelos, migrations, seeders |
-| `test-engineer-backend` | 3 | Tests unitarios e integración backend |
-| `test-engineer-frontend` | 3 | Tests unitarios y e2e frontend |
-| `qa-agent` | 4 | Estrategia QA, Gherkin, riesgos, performance |
-| `documentation-agent` | 5 | README, API docs, ADRs |
-
-**Claude Code**: invoca agentes con `@nombre-agente` o con skills `/comando`
-**GitHub Copilot**: usa `@nombre-agente` en el chat o los prompts en `.github/prompts/`
-
----
-
-## Ciclo de vida de una spec
-
-```
-DRAFT → APPROVED → IN_PROGRESS → IMPLEMENTED → DEPRECATED
-```
-
-Las specs viven en `.github/specs/<feature>.spec.md`. Solo pasan a implementación cuando el usuario las aprueba manualmente cambiando el campo `status`.
-
----
-
-## Estructura del repositorio
-
-```
-.
-├── .claude/                        ← Configuración Claude Code CLI
-│   ├── settings.json               ← Modelo, permisos, hooks
-│   ├── agents/                     ← Sub-agentes Claude Code
-│   ├── skills/                     ← Skills invocables con /comando
-│   ├── rules/                      ← Reglas automáticas por tipo de archivo
-│   ├── hooks/                      ← Scripts pre/post edit
-│   └── docs/lineamientos/          ← Dev guidelines y QA guidelines
-│
-├── .github/                        ← Configuración GitHub Copilot
-│   ├── copilot-instructions.md     ← Instrucciones globales + diccionario de dominio
-│   ├── AGENTS.md                   ← Reglas de Oro para todos los agentes
-│   ├── agents/                     ← Agentes Copilot
-│   ├── skills/                     ← Skills portables
-│   ├── instructions/               ← Instrucciones por scope (backend, frontend, tests)
-│   ├── prompts/                    ← Prompts rápidos reutilizables
-│   ├── requirements/               ← Requerimientos de entrada (input)
-│   └── specs/                      ← Especificaciones técnicas (output de fase 1)
-```
-
----
-
-## Ejemplo completo
+### Ejecutar solo la suite de Cucumber
 
 ```bash
-# 1. Escribe el requerimiento
-echo "El usuario debe poder convertir monedas en tiempo real" \
-  > .github/requirements/conversiones.md
+./gradlew clean test --tests com.auto.ui.runners.CucumberTestSuite --no-daemon
+```
 
-# 2. Genera la spec
-/generate-spec conversiones
+### Generar el reporte Serenity
 
-# 3. Abre .github/specs/conversiones.spec.md, revisa y cambia:
-#    status: DRAFT  →  status: APPROVED
+```bash
+./gradlew clean test aggregate
+```
 
-# 4. Orquesta la implementación
-/asdd-orchestrate conversiones
+### Solo regenerar el reporte (sin volver a ejecutar tests)
 
-# → Backend implementado
-# → Frontend implementado
-# → Tests generados
-# → Análisis QA completado
+```bash
+./gradlew aggregate
 ```
 
 ---
 
-## Documentación interna
+## Visualizar el reporte
 
-- `.github/README.md` — Guía detallada para GitHub Copilot
-- `.claude/README.md` — Guía detallada para Claude Code CLI
-- `.github/AGENTS.md` — Reglas de Oro y lineamientos de todos los agentes
-- `.github/specs/README.md` — Convenciones y ciclo de vida de specs
+Después de ejecutar `aggregate`, abre en el navegador:
+
+```
+target/site/serenity/index.html
+```
+
+---
+
+## Arquitectura Screenplay
+
+```
+Actor (Usuario)
+  └─ attemptsTo →  Tasks
+                    ├── OpenSignInPage   (navegar a /signin)
+                    ├── EnterCredentials (ingresar email + password)
+                    └── SubmitLogin      (enviar formulario)
+  └─ should      →  Questions
+                    ├── IsOnDashboard    (verifica URL post-login)
+                    └── LoginErrorMessage (lee texto del error)
+```
+
+Cada `Task` tiene **una sola responsabilidad** (SRP).
+
+---
+
+## Ajuste rápido de selectores
+
+Edita `src/test/java/com/auto/ui/ui/SignInPage.java` y actualiza los `locatedBy` según el DOM de tu aplicación:
+
+| Target | Selector por defecto | Ajustar si... |
+|---|---|---|
+| `EMAIL_FIELD` | `input[type='email'], input[placeholder='Email'], input[placeholder='Correo electrónico']` | El campo usa otro tipo o placeholder |
+| `PASSWORD_FIELD` | `input[type='password'], input[placeholder='Contraseña'], input[placeholder='Password']` | El campo usa otro tipo o placeholder |
+| `SUBMIT_BUTTON` | `button[type='submit']` | El botón no es de tipo `submit` |
+| `ERROR_MESSAGE` | `.alert-error, [data-testid='error-message'], .error-message, p.error, .text-red-500` | El error usa otra clase CSS |
