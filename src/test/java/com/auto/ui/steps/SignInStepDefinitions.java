@@ -40,9 +40,7 @@ public class SignInStepDefinitions {
         setTheStage(new OnlineCast());
         validEmail = TestConstants.DEFAULT_VALID_EMAIL;
         validPassword = TestConstants.DEFAULT_VALID_PASSWORD;
-        theActorCalled(TestConstants.ACTOR_NAME).attemptsTo(
-            EnsureUserExists.with(TestConstants.DEFAULT_FULL_NAME, validEmail, validPassword)
-        );
+        theActorCalled(TestConstants.ACTOR_NAME);
     }
 
     @After
@@ -55,7 +53,7 @@ public class SignInStepDefinitions {
     }
 
     private void waitForApplicationAvailability() {
-        String targetUrl = TestConstants.BASE_URL + TestConstants.SIGN_UP_PATH;
+        String targetUrl = TestConstants.BASE_URL + TestConstants.LOGIN_PATH;
         long deadline = System.currentTimeMillis() + (TestConstants.APP_AVAILABILITY_TIMEOUT_SECONDS * 1000L);
 
         while (System.currentTimeMillis() < deadline) {
@@ -72,7 +70,7 @@ public class SignInStepDefinitions {
 
         throw new IllegalStateException(
                 "La aplicacion no responde en " + targetUrl + " dentro de "
-                        + TestConstants.APP_AVAILABILITY_TIMEOUT_SECONDS + " segundos"
+                + TestConstants.APP_AVAILABILITY_TIMEOUT_SECONDS + " segundos"
         );
     }
 

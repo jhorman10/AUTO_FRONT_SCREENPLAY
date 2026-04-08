@@ -12,24 +12,24 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.time.Duration;
 
-public class OpenSignInPage implements Task {
+public class NavigateToRegistration implements Task {
 
     @Override
     public <T extends Actor> void performAs(T actor) {
         actor.attemptsTo(
-                Open.url(TestConstants.BASE_URL + TestConstants.LOGIN_PATH)
+                Open.url(TestConstants.BASE_URL + TestConstants.REGISTRATION_PATH)
         );
 
         WebDriver driver = BrowseTheWeb.as(actor).getDriver();
 
-        // Wait for form to be interactive (inputs become enabled after JS hydration)
+        // Wait for registration form to render (requires auth state to resolve)
         new WebDriverWait(driver, Duration.ofSeconds(TestConstants.DASHBOARD_WAIT_TIMEOUT_SECONDS))
-                .until(ExpectedConditions.elementToBeClickable(
-                        By.cssSelector("[data-testid='email-input']")
+                .until(ExpectedConditions.presenceOfElementLocated(
+                        By.cssSelector("[class*='AppointmentRegistrationForm'] button, form button")
                 ));
     }
 
-    public static OpenSignInPage now() {
-        return new OpenSignInPage();
+    public static NavigateToRegistration now() {
+        return new NavigateToRegistration();
     }
 }
